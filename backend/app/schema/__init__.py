@@ -13,6 +13,15 @@ from app.schemas.catalog import (
     UnitCreate,
     UnitResponse,
 )
+from app.schemas.customer import (
+    CustomerCreate,
+    CustomerResponse,
+    CustomerUpdate,
+    VIPCustomerResponse,
+    WhitelistCreate,
+    WhitelistResponse,
+    WhitelistUpdate,
+)
 from app.schemas.inventory import (
     InventoryLocationCreate,
     InventoryLocationResponse,
@@ -20,6 +29,15 @@ from app.schemas.inventory import (
     ProductBatchResponse,
     StockAdjustmentRequest,
     StockMovementResponse,
+)
+from app.schemas.pos import (
+    BarcodeLookupResponse,
+    CartCalculateRequest,
+    CartCalculateResponse,
+    CartItemCreate,
+    CartItemResponse,
+    HeldSaleResponse,
+    HoldSaleRequest,
 )
 
 __all__ = [
@@ -42,4 +60,18 @@ __all__ = [
     "ProductBatchResponse",
     "StockAdjustmentRequest",
     "StockMovementResponse",
+    "CustomerCreate",
+    "CustomerResponse",
+    "CustomerUpdate",
+    "VIPCustomerResponse",
+    "WhitelistCreate",
+    "WhitelistResponse",
+    "WhitelistUpdate",
+    "BarcodeLookupResponse",
+    "CartCalculateRequest",
+    "CartCalculateResponse",
+    "CartItemCreate",
+    "CartItemResponse",
+    "HeldSaleResponse",
+    "HoldSaleRequest",
 ]
