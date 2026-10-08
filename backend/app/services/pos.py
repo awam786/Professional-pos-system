@@ -6,6 +6,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.catalog import Product
+from app.models.customer import Customer
 from app.schemas.pos import (
     CartCalculateRequest,
     CartCalculateResponse,
@@ -37,7 +38,10 @@ async def calculate_cart(
         if product is None:
             raise HTTPException(
                 status_code=404,
-                detail=f"Product not found: {item.product_id}",
+                detail=(
+                    f"Product not found: "
+                    f"{item.product_id}"
+                ),
             )
 
         if product.current_stock < item.quantity:
@@ -46,7 +50,8 @@ async def calculate_cart(
                 detail=(
                     f"Insufficient stock for "
                     f"{product.name}. "
-                    f"Available: {product.current_stock}"
+                    f"Available: "
+                    f"{product.current_stock}"
                 ),
             )
 
@@ -102,29 +107,18 @@ async def calculate_cart(
             payload.customer_id,
         )
 
-        if vip:
-            result = await db.execute(
-                select(Product).where(
-                    Product.id.is_(None)
-                )
+        customer_result = await db.execute(
+            select(Customer).where(
+                Customer.id == payload.customer_id,
+                Customer.shop_id == shop_id,
             )
+        )
 
-            from app.models.customer import Customer
+        customer = customer_result.scalar_one_or_none()
 
-            customer_result = await db.execute(
-                select(Customer).where(
-                    Customer.id == payload.customer_id,
-                    Customer.shop_id == shop_id,
-                )
-            )
-
-            customer = (
-                customer_result.scalar_one_or_none()
-            )
-
-            if customer:
-                vip_name = customer.name
-                vip_code = customer.customer_code
+        if customer:
+            vip_name = customer.name
+            vip_code = customer.customer_code
 
     return CartCalculateResponse(
         items=result_items,
