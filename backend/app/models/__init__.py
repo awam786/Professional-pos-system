@@ -6,10 +6,18 @@ from app.models.catalog import (
     ProductVariant,
     Unit,
 )
+from app.models.customer import (
+    Customer,
+    WhitelistCustomer,
+)
 from app.models.inventory import (
     InventoryLocation,
     ProductBatch,
     StockMovement,
+)
+from app.models.pos import (
+    HeldSale,
+    POSSession,
 )
 
 __all__ = [
@@ -22,4 +30,8 @@ __all__ = [
     "InventoryLocation",
     "ProductBatch",
     "StockMovement",
+    "Customer",
+    "WhitelistCustomer",
+    "HeldSale",
+    "POSSession",
 ]
