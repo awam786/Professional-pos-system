@@ -6,6 +6,7 @@ from sqlalchemy import text
 
 from .config import settings
 from .database import AsyncSessionLocal, init_database
+from .routers import catalog, inventory
 from .schemas import HealthResponse
 
 
@@ -29,6 +30,17 @@ app.add_middleware(
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
+)
+
+
+app.include_router(
+    catalog.router,
+    prefix=settings.api_prefix,
+)
+
+app.include_router(
+    inventory.router,
+    prefix=settings.api_prefix,
 )
 
 
@@ -57,7 +69,11 @@ async def health_check():
         database_status = "disconnected"
 
     return HealthResponse(
-        status="healthy" if database_status == "connected" else "degraded",
+        status=(
+            "healthy"
+            if database_status == "connected"
+            else "degraded"
+        ),
         database=database_status,
         application=settings.app_name,
     )
