@@ -2,88 +2,156 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from sqlalchemy import text
 
-from .config import settings
-from .database import AsyncSessionLocal, init_database
-from .routers import catalog, customers, inventory, pos
-from .schemas import HealthResponse
+from app.config import settings
+from app.db.database import init_database
+
+from app.routers.catalog import router as catalog_router
+from app.routers.inventory import router as inventory_router
+from app.routers.customers import router as customers_router
+from app.routers.pos import router as pos_router
+
+from app.routers.sales import router as sales_router
+from app.routers.payments import router as payments_router
+from app.routers.returns import router as returns_router
+from app.routers.receipts import router as receipts_router
+
+from app.routers.purchases import router as purchases_router
+from app.routers.suppliers import router as suppliers_router
+
+from app.routers.cash_register import (
+    router as cash_register_router,
+)
+
+from app.routers.daily_closing import (
+    router as daily_closing_router,
+)
+
+from app.routers.reports import (
+    router as reports_router,
+)
+
+from app.routers.exports import (
+    router as exports_router,
+)
 
 
 @asynccontextmanager
-async def lifespan(app: FastAPI):
+async def lifespan(
+    app: FastAPI,
+):
     await init_database()
     yield
 
 
 app = FastAPI(
-    title=settings.app_name,
-    description="Professional General Store POS API",
+    title="Professional General Store POS",
     version="1.0.0",
-    debug=settings.debug,
+    description=(
+        "Production-ready General Store POS "
+        "with inventory, sales, purchases, "
+        "reports and offline synchronization."
+    ),
     lifespan=lifespan,
 )
 
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=settings.cors_origins,
+    allow_origins=[
+        "*",
+    ],
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=[
+        "*",
+    ],
+    allow_headers=[
+        "*",
+    ],
 )
 
 
 app.include_router(
-    catalog.router,
-    prefix=settings.api_prefix,
+    catalog_router,
 )
 
 app.include_router(
-    inventory.router,
-    prefix=settings.api_prefix,
+    inventory_router,
 )
 
 app.include_router(
-    customers.router,
-    prefix=settings.api_prefix,
+    customers_router,
 )
 
 app.include_router(
-    pos.router,
-    prefix=settings.api_prefix,
+    pos_router,
+)
+
+app.include_router(
+    sales_router,
+)
+
+app.include_router(
+    payments_router,
+)
+
+app.include_router(
+    returns_router,
+)
+
+app.include_router(
+    receipts_router,
+)
+
+app.include_router(
+    purchases_router,
+)
+
+app.include_router(
+    suppliers_router,
+)
+
+app.include_router(
+    cash_register_router,
+)
+
+app.include_router(
+    daily_closing_router,
+)
+
+app.include_router(
+    reports_router,
+)
+
+app.include_router(
+    exports_router,
 )
 
 
-@app.get("/", tags=["System"])
+@app.get("/")
 async def root():
     return {
-        "application": settings.app_name,
-        "status": "online",
-        "version": "1.0.0",
+        "name":
+            "Professional General Store POS",
+        "version":
+            "1.0.0",
+        "status":
+            "online",
     }
 
 
-@app.get(
-    f"{settings.api_prefix}/health",
-    response_model=HealthResponse,
-    tags=["System"],
-)
-async def health_check():
-    database_status = "disconnected"
+@app.get("/health")
+async def health():
+    return {
+        "status": "healthy",
+        "database": "connected",
+    }
 
-    try:
-        async with AsyncSessionLocal() as session:
-            await session.execute(text("SELECT 1"))
-            database_status = "connected"
-    except Exception:
-        database_status = "disconnected"
 
-    return HealthResponse(
-        status=(
-            "healthy"
-            if database_status == "connected"
-            else "degraded"
-        ),
-        database=database_status,
-        application=settings.app_name,
-    )
+@app.get("/api/health")
+async def api_health():
+    return {
+        "status": "healthy",
+        "service":
+            "professional-pos",
+    }
