@@ -6,7 +6,7 @@ from sqlalchemy import text
 
 from .config import settings
 from .database import AsyncSessionLocal, init_database
-from .routers import catalog, inventory
+from .routers import catalog, customers, inventory, pos
 from .schemas import HealthResponse
 
 
@@ -40,6 +40,16 @@ app.include_router(
 
 app.include_router(
     inventory.router,
+    prefix=settings.api_prefix,
+)
+
+app.include_router(
+    customers.router,
+    prefix=settings.api_prefix,
+)
+
+app.include_router(
+    pos.router,
     prefix=settings.api_prefix,
 )
 
